@@ -1,5 +1,12 @@
+/* eslint-disable prettier/prettier */
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
+
+interface Request {
+  title: string;
+  value: number;
+  type: 'outcome' | 'income' 
+}
 
 class CreateTransactionService {
   private transactionsRepository: TransactionsRepository;
@@ -8,8 +15,21 @@ class CreateTransactionService {
     this.transactionsRepository = transactionsRepository;
   }
 
-  public execute(): Transaction {
-    // TODO
+  public execute({ title, value, type }: Request): Transaction {
+    if(type === 'outcome'){
+      if(value > this.transactionsRepository.getBalance().total){
+        throw Error('Value must be lower than total for an outcome')
+      }
+    }
+    
+
+    const transaction = this.transactionsRepository.create({
+      title,
+      value,
+      type
+    });
+
+    return transaction;
   }
 }
 
